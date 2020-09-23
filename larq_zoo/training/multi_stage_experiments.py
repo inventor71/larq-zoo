@@ -66,14 +66,16 @@ class TrainR2BStrongBaseline(MultiStageExperiment):
 class TrainFPResnet18(LarqZooModelTrainingPhase):
     stage = Field(0)
     dataset = ComponentField(ImageNet)
-    learning_rate: float = Field(1e-1)
+    # learning_rate: float = Field(1e-1)
+    learning_rate: float = Field(1e-3)
     epochs: int = Field(100)
     batch_size: int = Field(512)
     # amount_of_images: int = Field(1281167)
     warmup_duration: int = Field(5)
 
     optimizer = Field(
-        lambda self: tf.keras.optimizers.SGD(
+        # lambda self: tf.keras.optimizers.SGD(
+        lambda self: tf.keras.optimizers.Adam(
             CosineDecayWithWarmup(
                 max_learning_rate=self.learning_rate,
                 warmup_steps=self.warmup_duration * self.steps_per_epoch,
@@ -81,8 +83,10 @@ class TrainFPResnet18(LarqZooModelTrainingPhase):
             )
         )
     )
+    # import pdb; pdb.set_trace()
 
     student_model = ComponentField(ResNet18FPFactory)
+
 
 
 @task

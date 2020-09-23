@@ -53,7 +53,7 @@ class TrainingPhase(TrainLarqZooModel):
 
         return (
             Path.home()
-            / "zookeeper-logs"
+            / "tf/data/zookeeper-logs"
             / self.dataset.__class__.__name__
             / self.__class__.__name__
             / datetime.now().strftime("%Y%m%d_%H%M")
@@ -163,7 +163,7 @@ class MultiStageExperiment:
         """
         return str(
             Path.home()
-            / "zookeeper-logs"
+            / "tf/data/zookeeper-logs"
             / "knowledge_distillation"
             / self.__class__.__name__
             / datetime.now().strftime("%Y%m%d_%H%M")

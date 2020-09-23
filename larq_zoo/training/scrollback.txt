@@ -1,0 +1,231 @@
+Starting stage 0 at 2020-09-23T14:06:57.772344.
++resnet_fp stats-----------------------------------------------------------------------------------------------+
+| Layer                                   Input prec.                 Outputs  # 32-bit    Memory  32-bit MACs |
+|                                               (bit)                               x 1      (kB)              |
++--------------------------------------------------------------------------------------------------------------+
+| input_1                                           -  ((None, 224, 224, 3),)         0         0            ? |
+| resnet_fp_block_1_conv2d                          -      (-1, 112, 112, 64)      9408     36.75    118013952 |
+| resnet_fp_block_1_batch_norm                      -      (-1, 112, 112, 64)       128      0.50            0 |
+| resnet_fp_block_1_relu                            -      (-1, 112, 112, 64)         0         0            ? |
+| resnet_fp_block_1_pool                            -        (-1, 56, 56, 64)         0         0            0 |
+| resnet_fp_block_2a_conv2d                         -        (-1, 56, 56, 64)     36928    144.25    115605504 |
+| resnet_fp_block_2a_batch_norm                     -        (-1, 56, 56, 64)       128      0.50            0 |
+| resnet_fp_block_2a_relu                           -        (-1, 56, 56, 64)         0         0            ? |
+| resnet_fp_block_2b_conv2d                         -        (-1, 56, 56, 64)     36928    144.25    115605504 |
+| resnet_fp_block_2b_batch_norm                     -        (-1, 56, 56, 64)       128      0.50            0 |
+| resnet_fp_block_2b_relu                           -        (-1, 56, 56, 64)         0         0            ? |
+| resnet_fp_block_2_skip_add                        -        (-1, 56, 56, 64)         0         0            ? |
+| resnet_fp_block_2_out                             -        (-1, 56, 56, 64)         0         0            ? |
+| resnet_fp_block_3a_conv2d                         -        (-1, 56, 56, 64)     36928    144.25    115605504 |
+| resnet_fp_block_3a_batch_norm                     -        (-1, 56, 56, 64)       128      0.50            0 |
+| resnet_fp_block_3a_relu                           -        (-1, 56, 56, 64)         0         0            ? |
+| resnet_fp_block_3b_conv2d                         -        (-1, 56, 56, 64)     36928    144.25    115605504 |
+| resnet_fp_block_3b_batch_norm                     -        (-1, 56, 56, 64)       128      0.50            0 |
+| resnet_fp_block_3b_relu                           -        (-1, 56, 56, 64)         0         0            ? |
+| resnet_fp_block_3_skip_add                        -        (-1, 56, 56, 64)         0         0            ? |
+| resnet_fp_block_3_out                             -        (-1, 56, 56, 64)         0         0            ? |
+| resnet_fp_block_4a_conv2d                         -       (-1, 28, 28, 128)     73856    288.50     57802752 |
+| resnet_fp_block_4a_batch_norm                     -       (-1, 28, 28, 128)       256      1.00            0 |
+| resnet_fp_block_4a_relu                           -       (-1, 28, 28, 128)         0         0            ? |
+| resnet_fp_block_4b_conv2d                         -       (-1, 28, 28, 128)    147584    576.50    115605504 |
+| resnet_fp_block_4_shortcut_pool                   -        (-1, 28, 28, 64)         0         0            0 |
+| resnet_fp_block_4b_batch_norm                     -       (-1, 28, 28, 128)       256      1.00            0 |
+| resnet_fp_block_4_shortcut_conv2d                 -       (-1, 28, 28, 128)      8192     32.00      6422528 |
+| resnet_fp_block_4b_relu                           -       (-1, 28, 28, 128)         0         0            ? |
+| resnet_fp_block_4_shortcut_batch_norm             -       (-1, 28, 28, 128)       256      1.00            0 |
+| resnet_fp_block_4_skip_add                        -       (-1, 28, 28, 128)         0         0            ? |
+| resnet_fp_block_4_out                             -       (-1, 28, 28, 128)         0         0            ? |
+| resnet_fp_block_5a_conv2d                         -       (-1, 28, 28, 128)    147584    576.50    115605504 |
+| resnet_fp_block_5a_batch_norm                     -       (-1, 28, 28, 128)       256      1.00            0 |
+| resnet_fp_block_5a_relu                           -       (-1, 28, 28, 128)         0         0            ? |
+| resnet_fp_block_5b_conv2d                         -       (-1, 28, 28, 128)    147584    576.50    115605504 |
+| resnet_fp_block_5b_batch_norm                     -       (-1, 28, 28, 128)       256      1.00            0 |
+| resnet_fp_block_5b_relu                           -       (-1, 28, 28, 128)         0         0            ? |
+| resnet_fp_block_5_skip_add                        -       (-1, 28, 28, 128)         0         0            ? |
+| resnet_fp_block_5_out                             -       (-1, 28, 28, 128)         0         0            ? |
+| resnet_fp_block_6a_conv2d                         -       (-1, 14, 14, 256)    295168   1153.00     57802752 |
+| resnet_fp_block_6a_batch_norm                     -       (-1, 14, 14, 256)       512      2.00            0 |
+| resnet_fp_block_6a_relu                           -       (-1, 14, 14, 256)         0         0            ? |
+| resnet_fp_block_6b_conv2d                         -       (-1, 14, 14, 256)    590080   2305.00    115605504 |
+| resnet_fp_block_6_shortcut_pool                   -       (-1, 14, 14, 128)         0         0            0 |
+| resnet_fp_block_6b_batch_norm                     -       (-1, 14, 14, 256)       512      2.00            0 |
+| resnet_fp_block_6_shortcut_conv2d                 -       (-1, 14, 14, 256)     32768    128.00      6422528 |
+| resnet_fp_block_6b_relu                           -       (-1, 14, 14, 256)         0         0            ? |
+| resnet_fp_block_6_shortcut_batch_norm             -       (-1, 14, 14, 256)       512      2.00            0 |
+| resnet_fp_block_6_skip_add                        -       (-1, 14, 14, 256)         0         0            ? |
+| resnet_fp_block_6_out                             -       (-1, 14, 14, 256)         0         0            ? |
+| resnet_fp_block_7a_conv2d                         -       (-1, 14, 14, 256)    590080   2305.00    115605504 |
+| resnet_fp_block_7a_batch_norm                     -       (-1, 14, 14, 256)       512      2.00            0 |
+| resnet_fp_block_7a_relu                           -       (-1, 14, 14, 256)         0         0            ? |
+| resnet_fp_block_7b_conv2d                         -       (-1, 14, 14, 256)    590080   2305.00    115605504 |
+| resnet_fp_block_7b_batch_norm                     -       (-1, 14, 14, 256)       512      2.00            0 |
+| resnet_fp_block_7b_relu                           -       (-1, 14, 14, 256)         0         0            ? |
+| resnet_fp_block_7_skip_add                        -       (-1, 14, 14, 256)         0         0            ? |
+| resnet_fp_block_7_out                             -       (-1, 14, 14, 256)         0         0            ? |
+| resnet_fp_block_8a_conv2d                         -         (-1, 7, 7, 512)   1180160   4610.00     57802752 |
+| resnet_fp_block_8a_batch_norm                     -         (-1, 7, 7, 512)      1024      4.00            0 |
+| resnet_fp_block_8a_relu                           -         (-1, 7, 7, 512)         0         0            ? |
+| resnet_fp_block_8b_conv2d                         -         (-1, 7, 7, 512)   2359808   9218.00    115605504 |
+| resnet_fp_block_8_shortcut_pool                   -         (-1, 7, 7, 256)         0         0            0 |
+| resnet_fp_block_8b_batch_norm                     -         (-1, 7, 7, 512)      1024      4.00            0 |
+| resnet_fp_block_8_shortcut_conv2d                 -         (-1, 7, 7, 512)    131072    512.00      6422528 |
+| resnet_fp_block_8b_relu                           -         (-1, 7, 7, 512)         0         0            ? |
+| resnet_fp_block_8_shortcut_batch_norm             -         (-1, 7, 7, 512)      1024      4.00            0 |
+| resnet_fp_block_8_skip_add                        -         (-1, 7, 7, 512)         0         0            ? |
+| resnet_fp_block_8_out                             -         (-1, 7, 7, 512)         0         0            ? |
+| resnet_fp_block_9a_conv2d                         -         (-1, 7, 7, 512)   2359808   9218.00    115605504 |
+| resnet_fp_block_9a_batch_norm                     -         (-1, 7, 7, 512)      1024      4.00            0 |
+| resnet_fp_block_9a_relu                           -         (-1, 7, 7, 512)         0         0            ? |
+| resnet_fp_block_9b_conv2d                         -         (-1, 7, 7, 512)   2359808   9218.00    115605504 |
+| resnet_fp_block_9b_batch_norm                     -         (-1, 7, 7, 512)      1024      4.00            0 |
+| resnet_fp_block_9b_relu                           -         (-1, 7, 7, 512)         0         0            ? |
+| resnet_fp_block_9_skip_add                        -         (-1, 7, 7, 512)         0         0            ? |
+| resnet_fp_block_9_out                             -         (-1, 7, 7, 512)         0         0            ? |
+| resnet_fp_block_10_global_pool_pool               -         (-1, 1, 1, 512)         0         0            0 |
+| resnet_fp_block_10_global_pool_flatten            -               (-1, 512)         0         0            0 |
+| resnet_fp_block_10_logits                         -              (-1, 1000)    513000   2003.91       512000 |
+| resnet_fp_block_10_probs                          -              (-1, 1000)         0         0            ? |
++--------------------------------------------------------------------------------------------------------------+
+| Total                                                                        11693352  45677.16   1814073344 |
++--------------------------------------------------------------------------------------------------------------+
++resnet_fp summary-------------------------+
+| Total params                   11.7 M    |
+| Trainable params               11.7 M    |
+| Non-trainable params           9.6 k     |
+| Model size                     44.61 MiB |
+| Model size (8-bit FP weights)  11.15 MiB |
+| Float-32 Equivalent            44.61 MiB |
+| Compression Ratio of Memory    1.00      |
+| Number of MACs                 1.81 B    |
++------------------------------------------+
+TrainFPResnet18(
+    dataset=ImageNet(
+        name="imagenet2012:5.0.*",
+        data_dir="/tf/data/tensorflow_datasets",
+        download=True,
+        train_split="train",
+        validation_split="validation",
+        test_split=None
+    ),
+    preprocessing=Default(
+        decoders={'image': <tensorflow_datasets.core.decode.base.SkipDecoding object at 0x7fb43287e2b0>},
+        input_shape=(224, 224, 3)
+    ),
+    model=TeacherStudentModelFactory(
+        dataset=ImageNet(
+            name="imagenet2012:5.0.*",
+            data_dir="/tf/data/tensorflow_datasets",
+            download=True,
+            train_split="train",
+            validation_split="validation",
+            test_split=None
+        ),
+        num_classes=1000,
+        include_top=True,
+        weights=None,
+        input_shape=None,
+        input_tensor=None,
+        teacher_model=<missing>,
+        student_model=ResNet18FPFactory(
+            dataset=ImageNet(
+                name="imagenet2012:5.0.*",
+                data_dir="/tf/data/tensorflow_datasets",
+                download=True,
+                train_split="train",
+                validation_split="validation",
+                test_split=None
+            ),
+            num_classes=1000,
+            include_top=True,
+            weights=None,
+            input_shape=None,
+            input_tensor=None,
+            model_name="resnet_fp",
+            momentum=0.99,
+            kernel_initializer="glorot_normal"
+        ),
+        initialize_teacher_weights_from=<missing>,
+        allow_missing_teacher_weights=False,
+        initialize_student_weights_from=<missing>,
+        model_dir="/tf/data/zookeeper-logs/knowledge_distillation/TrainR2B/20200923_1406/models",
+        classification_weight=1.0,
+        attention_matching_weight=0.0,
+        attention_matching_volume_names=<missing>,
+        attention_matching_volume_names_teacher=<missing>,
+        attention_matching_train_teacher=False,
+        output_matching_weight=0.0,
+        output_matching_softmax_temperature=1.0,
+        output_matching_train_teacher=False
+    ),
+    epochs=100,
+    batch_size=512,
+    loss=<callable>,
+    optimizer=<tensorflow.python.keras.optimizer_v2.adam.Adam object at 0x7fb42835fb70>,
+    use_model_checkpointing=True,
+    use_tensorboard=True,
+    use_progress_bar=False,
+    validation_frequency=1,
+    save_weights=True,
+    output_dir=/tf/data/zookeeper-logs/knowledge_distillation/TrainR2B/20200923_1406/stage_0,
+    metrics=['accuracy', 'sparse_top_k_categorical_accuracy'],
+    callbacks=[<larq_zoo.core.utils.ModelCheckpoint object at 0x7fb4327dc080>, <tensorflow.python.keras.callbacks.TensorBoard object at 0x7fb42834d6d8>],
+    stage=0,
+    teacher_model=<missing>,
+    student_model=ResNet18FPFactory(
+        dataset=ImageNet(
+            name="imagenet2012:5.0.*",
+            data_dir="/tf/data/tensorflow_datasets",
+            download=True,
+            train_split="train",
+            validation_split="validation",
+            test_split=None
+        ),
+        num_classes=1000,
+        include_top=True,
+        weights=None,
+        input_shape=None,
+        input_tensor=None,
+        model_name="resnet_fp",
+        momentum=0.99,
+        kernel_initializer="glorot_normal"
+    ),
+    initialize_teacher_weights_from=<missing>,
+    allow_missing_teacher_weights=False,
+    initialize_student_weights_from=<missing>,
+    parent_output_dir="/tf/data/zookeeper-logs/knowledge_distillation/TrainR2B/20200923_1406",
+    model_dir="/tf/data/zookeeper-logs/knowledge_distillation/TrainR2B/20200923_1406/models",
+    classification_weight=1.0,
+    attention_matching_weight=0.0,
+    attention_matching_volume_names=<missing>,
+    attention_matching_volume_names_teacher=<missing>,
+    attention_matching_train_teacher=False,
+    output_matching_weight=0.0,
+    output_matching_softmax_temperature=1.0,
+    output_matching_train_teacher=False,
+    learning_rate=0.001,
+    warmup_duration=5
+)
+Epoch 1/100
+2503/2503 - 627s - accuracy: 0.0531 - sparse_top_k_categorical_accuracy: 0.1422 - loss: 5.7883 - val_accuracy: 0.0942 - val_sparse_top_k_categorical_accuracy: 0.2408 - val_loss: 4.9957
+Epoch 2/100
+2503/2503 - 634s - accuracy: 0.1758 - sparse_top_k_categorical_accuracy: 0.3739 - loss: 4.3054 - val_accuracy: 0.1854 - val_sparse_top_k_categorical_accuracy: 0.4016 - val_loss: 4.2382
+Epoch 3/100
+2503/2503 - 616s - accuracy: 0.2651 - sparse_top_k_categorical_accuracy: 0.4973 - loss: 3.6418 - val_accuracy: 0.2428 - val_sparse_top_k_categorical_accuracy: 0.4786 - val_loss: 3.8336
+Epoch 4/100
+2503/2503 - 608s - accuracy: 0.3263 - sparse_top_k_categorical_accuracy: 0.5704 - loss: 3.2412 - val_accuracy: 0.3276 - val_sparse_top_k_categorical_accuracy: 0.5890 - val_loss: 3.1361
+Epoch 5/100
+2503/2503 - 622s - accuracy: 0.3700 - sparse_top_k_categorical_accuracy: 0.6173 - loss: 2.9742 - val_accuracy: 0.3530 - val_sparse_top_k_categorical_accuracy: 0.6129 - val_loss: 3.0263
+Epoch 6/100
+2503/2503 - 674s - accuracy: 0.4088 - sparse_top_k_categorical_accuracy: 0.6555 - loss: 2.7496 - val_accuracy: 0.4244 - val_sparse_top_k_categorical_accuracy: 0.6851 - val_loss: 2.5970
+Epoch 7/100
+2503/2503 - 606s - accuracy: 0.4416 - sparse_top_k_categorical_accuracy: 0.6856 - loss: 2.5667 - val_accuracy: 0.4501 - val_sparse_top_k_categorical_accuracy: 0.7100 - val_loss: 2.4432
+Epoch 8/100
+2503/2503 - 649s - accuracy: 0.4658 - sparse_top_k_categorical_accuracy: 0.7075 - loss: 2.4330 - val_accuracy: 0.4458 - val_sparse_top_k_categorical_accuracy: 0.7013 - val_loss: 2.4922
+Epoch 9/100
+2503/2503 - 603s - accuracy: 0.4836 - sparse_top_k_categorical_accuracy: 0.7226 - loss: 2.3365 - val_accuracy: 0.5081 - val_sparse_top_k_categorical_accuracy: 0.7577 - val_loss: 2.1441
+Epoch 10/100
+2503/2503 - 598s - accuracy: 0.4986 - sparse_top_k_categorical_accuracy: 0.7353 - loss: 2.2562 - val_accuracy: 0.5219 - val_sparse_top_k_categorical_accuracy: 0.7685 - val_loss: 2.0794
+Epoch 11/100
+2503/2503 - 607s - accuracy: 0.5115 - sparse_top_k_categorical_accuracy: 0.7460 - loss: 2.1878 - val_accuracy: 0.5104 - val_sparse_top_k_categorical_accuracy: 0.7594 - val_loss: 2.1462
+Epoch 12/100
+2503/2503 - 611s - accuracy: 0.5227 - sparse_top_k_categorical_accuracy: 0.7545 - loss: 2.1309 - val_accuracy: 0.5167 - val_sparse_top_k_categorical_accuracy: 0.7606 - val_loss: 2.1401

@@ -12,6 +12,66 @@ from zookeeper import Field, factory
 
 from larq_zoo.core import utils
 from larq_zoo.core.model_factory import ModelFactory
+from larq import utils as lq_utils
+
+
+@lq_utils.register_keras_custom_object
+class WeightDecay(tf.keras.constraints.Constraint):
+    def __init__(
+        self,
+        max_learning_rate: float,
+        weight_decay_constant: float,
+        optimizer: Optional[tf.keras.optimizers.Optimizer] = None,
+    ) -> None:
+        """Weight decay constraint which can be passed in as a `kernel_constraint`.
+        This allows for applying weight decay correctly with any optimizer. This is not
+        the case when using l2 regularization, which is not equivalent to using weight
+        decay for anything other than SGD without momentum.
+        When using this class, make sure to pass in the `learning_rate_variable` that is
+        updated during training.
+        :param max_learning_rate: maximum learning rate, used to normalize the current
+            learning rate.
+        :param optimizer: keras optimizer that has a lr variable (which can optionally be a schedule).
+        :param weight_decay_constant: strength of the weight decay.
+        """
+        # import pdb; pdb.set_trace()
+        self.optimizer = optimizer if optimizer is not None else max_learning_rate
+        self.max_learning_rate = max_learning_rate
+        self.weight_decay_constant = weight_decay_constant
+        self.old_lr = None
+
+        if self.max_learning_rate <= 0:
+            warnings.warn(
+                "WeightDecay: no weight decay will be applied as the received learning rate is 0."
+            )
+            self.multiplier = 0
+        else:
+            self.multiplier = self.weight_decay_constant / self.max_learning_rate
+
+    def __call__(self, x):
+        if isinstance(
+            self.optimizer.lr, tf.keras.optimizers.schedules.LearningRateSchedule,
+        ):
+            lr = self.optimizer.lr(self.optimizer.iterations)
+        else:
+            lr = self.optimizer.lr
+
+        # import pdb; pdb.set_trace()
+        # if (self.old_lr == lr):
+            # pass
+        # else:
+            # # tf.print(lr, output_stream=sys.stdout)
+            # print(f"lr: {lr}")
+            # self.old_lr = lr
+
+        return (1.0 - lr * self.multiplier) * x
+
+    def get_config(self):
+        # import pdb; pdb.set_trace()
+        return {
+            "max_learning_rate": self.max_learning_rate,
+            "weight_decay_constant": self.weight_decay_constant,
+        }
 
 
 class _SharedBaseFactory(ModelFactory, metaclass=ABCMeta):
@@ -22,6 +82,7 @@ class _SharedBaseFactory(ModelFactory, metaclass=ABCMeta):
     momentum: float = Field(0.99)
     kernel_initializer: str = Field("glorot_normal")
     kernel_regularizer = None
+    kernel_constraint = None
 
     def first_block(
         self, x: tf.Tensor, use_prelu: bool = True, name: str = ""
@@ -34,6 +95,7 @@ class _SharedBaseFactory(ModelFactory, metaclass=ABCMeta):
             strides=2,
             kernel_initializer=self.kernel_initializer,
             kernel_regularizer=self.kernel_regularizer,
+            kernel_constraint=self.kernel_constraint,
             padding="same",
             name=f"{name}_conv2d",
             use_bias=False,
@@ -424,11 +486,15 @@ class ResNet18FPFactory(ResNet18Factory):
     model_name = Field("resnet_fp")
     input_quantizer = None
     kernel_quantizer = None
-    kernel_constraint = None
-
+    # import pdb; pdb.set_trace()
     @property
-    def kernel_regularizer(self):
-        return tf.keras.regularizers.l2(1e-5)
+    def kernel_constraint(self):
+        optimizer = self.__component_parent__.__component_parent__.optimizer
+        return WeightDecay(max_learning_rate=1e-3, weight_decay_constant=1e-5, optimizer=optimizer)
+
+    # @property
+    # def kernel_regularizer(self):
+        # return tf.keras.regularizers.l2(1e-5)
 
 
 def RealToBinaryNet(

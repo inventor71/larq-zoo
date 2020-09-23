@@ -24,6 +24,7 @@ class TrainLarqZooModel(Experiment):
 
     # Use a per-batch progress bar (as opposed to per-epoch).
     use_progress_bar: bool = Field(False)
+    # use_progress_bar: bool = Field(True)
 
     # How often to run validation.
     validation_frequency: int = Field(1)
@@ -36,7 +37,7 @@ class TrainLarqZooModel(Experiment):
     def output_dir(self) -> Union[str, os.PathLike]:
         return (
             Path.home()
-            / "zookeeper-logs"
+            / "tf/data/zookeeper-logs"
             / self.dataset.__class__.__name__
             / self.__class__.__name__
             / datetime.now().strftime("%Y%m%d_%H%M")
@@ -86,7 +87,8 @@ class TrainLarqZooModel(Experiment):
             decoders=self.preprocessing.decoders
         )
         train_data = (
-            train_data.cache()
+            # train_data.cache()
+            train_data
             .shuffle(10 * self.batch_size)
             .repeat()
             .map(
@@ -101,7 +103,8 @@ class TrainLarqZooModel(Experiment):
             decoders=self.preprocessing.decoders
         )
         validation_data = (
-            validation_data.cache()
+            # validation_data.cache()
+            validation_data
             .repeat()
             .map(self.preprocessing, num_parallel_calls=tf.data.experimental.AUTOTUNE)
             .batch(self.batch_size)
@@ -113,6 +116,7 @@ class TrainLarqZooModel(Experiment):
                 optimizer=self.optimizer,
                 loss=self.loss,
                 metrics=self.metrics,
+                # run_eagerly=True,
             )
 
             lq.models.summary(self.model)
@@ -122,6 +126,8 @@ class TrainLarqZooModel(Experiment):
                 print(f"Loaded model from epoch {initial_epoch}.")
 
         click.secho(str(self))
+
+        # import pdb; pdb.set_trace()
 
         self.model.fit(
             train_data,
