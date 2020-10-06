@@ -34,7 +34,6 @@ class WeightDecay(tf.keras.constraints.Constraint):
         :param optimizer: keras optimizer that has a lr variable (which can optionally be a schedule).
         :param weight_decay_constant: strength of the weight decay.
         """
-        # import pdb; pdb.set_trace()
         self.optimizer = optimizer if optimizer is not None else max_learning_rate
         self.max_learning_rate = max_learning_rate
         self.weight_decay_constant = weight_decay_constant
@@ -56,18 +55,9 @@ class WeightDecay(tf.keras.constraints.Constraint):
         else:
             lr = self.optimizer.lr
 
-        # import pdb; pdb.set_trace()
-        # if (self.old_lr == lr):
-            # pass
-        # else:
-            # # tf.print(lr, output_stream=sys.stdout)
-            # print(f"lr: {lr}")
-            # self.old_lr = lr
-
         return (1.0 - lr * self.multiplier) * x
 
     def get_config(self):
-        # import pdb; pdb.set_trace()
         return {
             "max_learning_rate": self.max_learning_rate,
             "weight_decay_constant": self.weight_decay_constant,
@@ -435,7 +425,7 @@ class StrongBaselineNetBANFactory(StrongBaselineNetFactory):
 
     @property
     def kernel_regularizer(self):
-        return tf.keras.regularizers.l2(1e-5)
+        return tf.keras.regularizers.l2(self.__component_parent__.__component_parent__.weight_decay_constant)
 
 
 @factory
@@ -458,7 +448,7 @@ class RealToBinNetFPFactory(RealToBinNetFactory):
 
     @property
     def kernel_regularizer(self):
-        return tf.keras.regularizers.l2(1e-5)
+        return tf.keras.regularizers.l2(self.__component_parent__.__component_parent__.weight_decay_constant)
 
 
 @factory
@@ -470,7 +460,7 @@ class RealToBinNetBANFactory(RealToBinNetFactory):
 
     @property
     def kernel_regularizer(self):
-        return tf.keras.regularizers.l2(1e-5)
+        return tf.keras.regularizers.l2(self.__component_parent__.__component_parent__.weight_decay_constant)
 
 
 @factory
@@ -486,15 +476,11 @@ class ResNet18FPFactory(ResNet18Factory):
     model_name = Field("resnet_fp")
     input_quantizer = None
     kernel_quantizer = None
-    # import pdb; pdb.set_trace()
-    @property
-    def kernel_constraint(self):
-        optimizer = self.__component_parent__.__component_parent__.optimizer
-        return WeightDecay(max_learning_rate=1e-3, weight_decay_constant=1e-5, optimizer=optimizer)
+    kernel_constraint = None
 
-    # @property
-    # def kernel_regularizer(self):
-        # return tf.keras.regularizers.l2(1e-5)
+    @property
+    def kernel_regularizer(self):
+        return tf.keras.regularizers.l2(self.__component_parent__.__component_parent__.weight_decay_constant)
 
 
 def RealToBinaryNet(
