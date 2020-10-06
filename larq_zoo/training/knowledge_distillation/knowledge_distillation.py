@@ -349,7 +349,7 @@ class TeacherStudentModelFactory(ModelFactory):
                 print(f"Loading {name} weights from {path}.")
                 sub_model.load_weights(
                     path
-                ).expect_partial()  # .assert_existing_objects_matched()
+                )
             except tf.errors.InvalidArgumentError as e:
                 raise (
                     ValueError(

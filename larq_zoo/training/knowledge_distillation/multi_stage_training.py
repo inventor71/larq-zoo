@@ -53,10 +53,10 @@ class TrainingPhase(TrainLarqZooModel):
 
         return (
             Path.home()
-            / "tf/data/zookeeper-logs"
+            / "tf/data/larq-zoo/zookeeper-logs"
             / self.dataset.__class__.__name__
             / self.__class__.__name__
-            / datetime.now().strftime("%Y%m%d_%H%M")
+            / datetime.now().strftime("%Y%m%d_%H%M%S")
         )
 
     @Field
@@ -163,10 +163,10 @@ class MultiStageExperiment:
         """
         return str(
             Path.home()
-            / "tf/data/zookeeper-logs"
+            / "tf/data/larq-zoo/zookeeper-logs"
             / "knowledge_distillation"
             / self.__class__.__name__
-            / datetime.now().strftime("%Y%m%d_%H%M")
+            / datetime.now().strftime("%Y%m%d_%H%M%S")
         )
 
     @Field
