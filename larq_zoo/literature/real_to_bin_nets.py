@@ -70,6 +70,7 @@ class _SharedBaseFactory(ModelFactory, metaclass=ABCMeta):
 
     model_name: str = Field()
     momentum: float = Field(0.99)
+    model_modifier: str = Field()
     kernel_initializer: str = Field("glorot_normal")
     kernel_regularizer = None
     kernel_constraint = None
@@ -127,9 +128,15 @@ class _SharedBaseFactory(ModelFactory, metaclass=ABCMeta):
     ) -> tf.Tensor:
         if in_channels == out_channels:
             return x
-        x = tf.keras.layers.AvgPool2D(
-            2, strides=2, padding="same", name=f"{name}_shortcut_pool"
-        )(x)
+        if self.model_modifier == "use_maxpool_in_shortcut":
+            x = tf.keras.layers.MaxPool2D(
+                2, strides=2, padding="same", name=f"{name}_shortcut_maxpool"
+            )(x)
+        else:
+            x = tf.keras.layers.AvgPool2D(
+                2, strides=2, padding="same", name=f"{name}_shortcut_pool"
+            )(x)
+
         x = tf.keras.layers.Conv2D(
             out_channels,
             kernel_size=1,
@@ -424,6 +431,10 @@ class StrongBaselineNetBANFactory(StrongBaselineNetFactory):
     kernel_constraint = None
 
     @property
+    def model_regularizer(self):
+        return self.__component_parent__.__component_parent__.model_modifier
+
+    @property
     def kernel_regularizer(self):
         return tf.keras.regularizers.l2(self.__component_parent__.__component_parent__.weight_decay_constant)
 
@@ -435,12 +446,20 @@ class StrongBaselineNetBNNFactory(StrongBaselineNetFactory):
     kernel_quantizer = "ste_sign"
     kernel_constraint = "weight_clip"
 
+    @property
+    def model_regularizer(self):
+        return self.__component_parent__.__component_parent__.model_modifier
+
 
 @factory
 class RealToBinNetFPFactory(RealToBinNetFactory):
     model_name = Field("r2b_fp")
     kernel_quantizer = None
     kernel_constraint = None
+
+    @property
+    def model_regularizer(self):
+        return self.__component_parent__.__component_parent__.model_modifier
 
     @property
     def input_quantizer(self):
@@ -459,6 +478,10 @@ class RealToBinNetBANFactory(RealToBinNetFactory):
     kernel_constraint = None
 
     @property
+    def model_regularizer(self):
+        return self.__component_parent__.__component_parent__.model_modifier
+
+    @property
     def kernel_regularizer(self):
         return tf.keras.regularizers.l2(self.__component_parent__.__component_parent__.weight_decay_constant)
 
@@ -470,6 +493,10 @@ class RealToBinNetBNNFactory(RealToBinNetFactory):
     kernel_quantizer = "ste_sign"
     kernel_constraint = "weight_clip"
 
+    @property
+    def model_regularizer(self):
+        return self.__component_parent__.__component_parent__.model_modifier
+
 
 @factory
 class ResNet18FPFactory(ResNet18Factory):
@@ -477,6 +504,10 @@ class ResNet18FPFactory(ResNet18Factory):
     input_quantizer = None
     kernel_quantizer = None
     kernel_constraint = None
+
+    @property
+    def model_regularizer(self):
+        return self.__component_parent__.__component_parent__.model_modifier
 
     @property
     def kernel_regularizer(self):

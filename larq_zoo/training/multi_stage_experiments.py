@@ -1,5 +1,5 @@
 import tensorflow as tf
-from zookeeper import ComponentField, Field, cli, task
+from zookeeper import ComponentField, Field, cli, task, configure
 
 from larq_zoo.literature.real_to_bin_nets import (
     RealToBinNetBANFactory,
@@ -68,6 +68,7 @@ class TrainFPResnet18(LarqZooModelTrainingPhase):
     dataset = ComponentField(ImageNet)
     # learning_rate: float = Field(1e-1)
     learning_rate: float = Field(1e-3)
+    model_modifier: str = Field()
     weight_decay_constant: float = Field(1e-5)
     epochs: int = Field(100)
     batch_size: int = Field(512)
@@ -95,6 +96,7 @@ class TrainR2BBFP(TrainFPResnet18):
     stage = Field(1)
     learning_rate: float = Field(1e-3)
     learning_rate_decay: float = Field(0.3)
+    weight_decay_constant: float = Field(5e-6)
     epochs: int = Field(75)
     batch_size: int = Field(256)
 
@@ -125,6 +127,7 @@ class TrainR2BBFP(TrainFPResnet18):
 class TrainR2BBAN(TrainR2BBFP):
     stage = Field(2)
     learning_rate: float = Field(1e-3)
+    weight_decay_constant: float = Field(1e-5)
 
     teacher_model = ComponentField(RealToBinNetFPFactory)
     student_model = ComponentField(RealToBinNetBANFactory)
@@ -136,6 +139,7 @@ class TrainR2BBAN(TrainR2BBFP):
 class TrainR2BBNN(TrainR2BBFP):
     stage = Field(3)
     learning_rate: float = Field(2e-4)
+    weight_decay_constant: float = Field(0.0)
 
     classification_weight = Field(1.0)
     attention_matching_weight = Field(0.0)
@@ -167,6 +171,7 @@ class TrainR2BBNNAlternative(TrainR2BBNN):
 
 @task
 class TrainR2B(MultiStageExperiment):
+    model_modifier: str = Field()
     stage_0 = ComponentField(TrainFPResnet18)
     stage_1 = ComponentField(TrainR2BBFP)
     stage_2 = ComponentField(TrainR2BBAN)
