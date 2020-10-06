@@ -68,6 +68,7 @@ class TrainFPResnet18(LarqZooModelTrainingPhase):
     dataset = ComponentField(ImageNet)
     # learning_rate: float = Field(1e-1)
     learning_rate: float = Field(1e-3)
+    weight_decay_constant: float = Field(1e-5)
     epochs: int = Field(100)
     batch_size: int = Field(512)
     # amount_of_images: int = Field(1281167)
