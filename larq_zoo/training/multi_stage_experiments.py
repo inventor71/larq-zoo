@@ -68,7 +68,6 @@ class TrainFPResnet18(LarqZooModelTrainingPhase):
     dataset = ComponentField(ImageNet)
     # learning_rate: float = Field(1e-1)
     learning_rate: float = Field(1e-3)
-    model_modifier: str = Field()
     weight_decay_constant: float = Field(1e-5)
     epochs: int = Field(100)
     batch_size: int = Field(512)
@@ -171,7 +170,8 @@ class TrainR2BBNNAlternative(TrainR2BBNN):
 
 @task
 class TrainR2B(MultiStageExperiment):
-    model_modifier: str = Field()
+    model_modifier: str = Field("default")
+    input_quantizer: str = Field("ste_sign")
     stage_0 = ComponentField(TrainFPResnet18)
     stage_1 = ComponentField(TrainR2BBFP)
     stage_2 = ComponentField(TrainR2BBAN)

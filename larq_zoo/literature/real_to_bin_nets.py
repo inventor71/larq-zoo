@@ -431,10 +431,6 @@ class StrongBaselineNetBANFactory(StrongBaselineNetFactory):
     kernel_constraint = None
 
     @property
-    def model_regularizer(self):
-        return self.__component_parent__.__component_parent__.model_modifier
-
-    @property
     def kernel_regularizer(self):
         return tf.keras.regularizers.l2(self.__component_parent__.__component_parent__.weight_decay_constant)
 
@@ -446,20 +442,12 @@ class StrongBaselineNetBNNFactory(StrongBaselineNetFactory):
     kernel_quantizer = "ste_sign"
     kernel_constraint = "weight_clip"
 
-    @property
-    def model_regularizer(self):
-        return self.__component_parent__.__component_parent__.model_modifier
-
 
 @factory
 class RealToBinNetFPFactory(RealToBinNetFactory):
     model_name = Field("r2b_fp")
     kernel_quantizer = None
     kernel_constraint = None
-
-    @property
-    def model_regularizer(self):
-        return self.__component_parent__.__component_parent__.model_modifier
 
     @property
     def input_quantizer(self):
@@ -478,10 +466,6 @@ class RealToBinNetBANFactory(RealToBinNetFactory):
     kernel_constraint = None
 
     @property
-    def model_regularizer(self):
-        return self.__component_parent__.__component_parent__.model_modifier
-
-    @property
     def kernel_regularizer(self):
         return tf.keras.regularizers.l2(self.__component_parent__.__component_parent__.weight_decay_constant)
 
@@ -493,10 +477,6 @@ class RealToBinNetBNNFactory(RealToBinNetFactory):
     kernel_quantizer = "ste_sign"
     kernel_constraint = "weight_clip"
 
-    @property
-    def model_regularizer(self):
-        return self.__component_parent__.__component_parent__.model_modifier
-
 
 @factory
 class ResNet18FPFactory(ResNet18Factory):
@@ -504,10 +484,6 @@ class ResNet18FPFactory(ResNet18Factory):
     input_quantizer = None
     kernel_quantizer = None
     kernel_constraint = None
-
-    @property
-    def model_regularizer(self):
-        return self.__component_parent__.__component_parent__.model_modifier
 
     @property
     def kernel_regularizer(self):
