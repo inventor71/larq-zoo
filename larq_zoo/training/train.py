@@ -23,8 +23,8 @@ class TrainLarqZooModel(Experiment):
     use_tensorboard: bool = Field(True)
 
     # Use a per-batch progress bar (as opposed to per-epoch).
-    use_progress_bar: bool = Field(False)
-    # use_progress_bar: bool = Field(True)
+    # use_progress_bar: bool = Field(False)
+    use_progress_bar: bool = Field(True)
 
     # How often to run validation.
     validation_frequency: int = Field(1)
@@ -37,10 +37,10 @@ class TrainLarqZooModel(Experiment):
     def output_dir(self) -> Union[str, os.PathLike]:
         return (
             Path.home()
-            / "tf/data/zookeeper-logs"
+            / "tf/data/larq-zoo/zookeeper-logs"
             / self.dataset.__class__.__name__
             / self.__class__.__name__
-            / datetime.now().strftime("%Y%m%d_%H%M")
+            / datetime.now().strftime("%Y%m%d_%H%M%S")
         )
 
     @property
