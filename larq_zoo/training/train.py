@@ -128,6 +128,11 @@ class TrainLarqZooModel(Experiment):
         click.secho(str(self))
 
         # import pdb; pdb.set_trace()
+        # Save config Json
+        with open(
+            Path(self.output_dir) / f"{self.model.name}.json", "w"
+        ) as json_file:
+            json_file.write(self.model.to_json())
 
         self.model.fit(
             train_data,
@@ -147,7 +152,3 @@ class TrainLarqZooModel(Experiment):
             self.model.save_weights(
                 str(Path(self.output_dir) / f"{self.model.name}_weights.h5")
             )
-            with open(
-                Path(self.output_dir) / f"{self.model.name}.json", "w"
-            ) as json_file:
-                json_file.write(self.model.to_json())
