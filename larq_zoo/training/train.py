@@ -32,6 +32,9 @@ class TrainLarqZooModel(Experiment):
     # Whether or not to save models at the end.
     save_weights: bool = Field(True)
 
+    # Whether to use eager execution
+    use_eager_execution: bool = Field(False)
+
     # Where to store output.
     @Field
     def output_dir(self) -> Union[str, os.PathLike]:
@@ -116,7 +119,7 @@ class TrainLarqZooModel(Experiment):
                 optimizer=self.optimizer,
                 loss=self.loss,
                 metrics=self.metrics,
-                # run_eagerly=True,
+                run_eagerly=self.use_eager_execution,
             )
 
             lq.models.summary(self.model)

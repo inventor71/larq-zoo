@@ -24,6 +24,7 @@ class TrainR2BStrongBaselineBAN(LarqZooModelTrainingPhase):
     stage = Field(0)
 
     dataset = ComponentField(ImageNet)
+    model_modifier: str = Field("default")
 
     learning_rate: float = Field(1e-3)
     learning_rate_decay: float = Field(0.1)
@@ -66,6 +67,7 @@ class TrainR2BStrongBaseline(MultiStageExperiment):
 class TrainFPResnet18(LarqZooModelTrainingPhase):
     stage = Field(0)
     dataset = ComponentField(ImageNet)
+    model_modifier: str = Field("default")
     # learning_rate: float = Field(1e-1)
     learning_rate: float = Field(1e-3)
     weight_decay_constant: float = Field(1e-5)
@@ -109,6 +111,7 @@ class TrainR2BBFP(TrainFPResnet18):
         )
     )
 
+    x_offset: float = Field(0.0)
     teacher_model = ComponentField(ResNet18FPFactory)
     initialize_teacher_weights_from = Field("resnet_fp")
     student_model = ComponentField(RealToBinNetFPFactory)
@@ -123,15 +126,48 @@ class TrainR2BBFP(TrainFPResnet18):
 
 
 @task
+class TrainR2BBFPAlternative(TrainR2BBFP):
+    """We deviate slightly from Martinez et. al. here"""
+    warmup_duration = Field(5)
+    epochs: int = Field(100)
+    optimizer = Field(
+        lambda self: tf.keras.optimizers.Adam(
+            CosineDecayWithWarmup(
+                max_learning_rate=self.learning_rate,
+                warmup_steps=self.steps_per_epoch * self.warmup_duration,
+                decay_steps=self.steps_per_epoch * (self.epochs - self.warmup_duration),
+            )
+        )
+    )
+
+
+@task
 class TrainR2BBAN(TrainR2BBFP):
     stage = Field(2)
     learning_rate: float = Field(1e-3)
     weight_decay_constant: float = Field(1e-5)
 
+    x_offset: float = Field(0.0)
     teacher_model = ComponentField(RealToBinNetFPFactory)
     student_model = ComponentField(RealToBinNetBANFactory)
 
     initialize_teacher_weights_from = Field("r2b_fp")
+
+
+@task
+class TrainR2BBANAlternative(TrainR2BBAN):
+    """We deviate slightly from Martinez et. al. here"""
+    warmup_duration = Field(5)
+    epochs: int = Field(100)
+    optimizer = Field(
+        lambda self: tf.keras.optimizers.Adam(
+            CosineDecayWithWarmup(
+                max_learning_rate=self.learning_rate,
+                warmup_steps=self.steps_per_epoch * self.warmup_duration,
+                decay_steps=self.steps_per_epoch * (self.epochs - self.warmup_duration),
+            )
+        )
+    )
 
 
 @task
@@ -145,6 +181,7 @@ class TrainR2BBNN(TrainR2BBFP):
     output_matching_weight = Field(0.8)
     output_matching_softmax_temperature = Field(1.0)
 
+    x_offset: float = Field(0.0)
     teacher_model = ComponentField(RealToBinNetBANFactory)
     student_model = ComponentField(RealToBinNetBNNFactory)
 
@@ -171,7 +208,7 @@ class TrainR2BBNNAlternative(TrainR2BBNN):
 @task
 class TrainR2B(MultiStageExperiment):
     model_modifier: str = Field("default")
-    input_quantizer: str = Field("ste_sign")
+    # input_quantizer: str = Field("ste_sign")
     stage_0 = ComponentField(TrainFPResnet18)
     stage_1 = ComponentField(TrainR2BBFP)
     stage_2 = ComponentField(TrainR2BBAN)
