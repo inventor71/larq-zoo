@@ -71,6 +71,7 @@ class _SharedBaseFactory(ModelFactory, metaclass=ABCMeta):
     model_name: str = Field()
     momentum: float = Field(0.99)
     model_modifier: str = Field()
+    weight_decay_constant: float = Field()
     kernel_initializer: str = Field("glorot_normal")
     kernel_regularizer = None
     kernel_constraint = None
@@ -189,6 +190,8 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
     """Constructor for the strong baseline network (Section 4.1 of Martinez et al.)."""
 
     scaling_r: int = 8
+    x_offset: float = Field()
+    use_unsign: bool = Field()
 
     input_quantizer = None
     kernel_quantizer = None
@@ -285,6 +288,11 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
             momentum=self.momentum, name=f"{name}_batch_norm"
         )(x)
 
+        # Shift conv_input in negative direction by shift_value.
+        shift_value = self.x_offset
+        if shift_value != 0:
+            x = tf.add(conv_input, -shift_value, name=f"{name}_shift{shift_value:.1f}_input")
+
         # Convolution
         conv_output = lq.layers.QuantConv2D(
             out_channels,
@@ -300,7 +308,7 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
             kernel_initializer=self.kernel_initializer,
             use_bias=False,
             name=f"{name}_conv2d",
-        )(conv_input)
+        )(x)
 
         # binary convolution rescaling
         x = self._scale_binary_conv_output(conv_input, conv_output, name)
@@ -362,64 +370,10 @@ class RealToBinNetFactory(StrongBaselineNetFactory):
             [conv_output, scales]
         )
 
-    def half_binary_block(
-        self, x: tf.Tensor, downsample: bool = False, name: str = ""
-    ) -> tf.Tensor:
-        """One half of the binary block from Figure 1 (Left) of Martinez et al. (2019).
-
-        This block gets repeated and matched up with/supervised by a single real block,
-        which has two convolutions.
-
-        Channel scaling follows Figure 1 (Right).
-        """
-
-        in_channels = x.shape[-1]
-        out_channels = int(in_channels * 2 if downsample else in_channels)
-
-        # Shortcut, which gets downsampled if necessary
-        shortcut_add = self.shortcut_connection(x, name, in_channels, out_channels)
-
-        # Batch Normalization
-        conv_input = tf.keras.layers.BatchNormalization(
-            momentum=self.momentum, name=f"{name}_batch_norm"
-        )(x)
-
-        # Shift conv_input in negative direction by shift_value.
-        # TODO (VINN)
-        shift_value = self.__component_parent__.__component_parent__.x_offset
-        shifted_conv_input = tf.add(conv_input, -shift_value, name=f"{name}_shift{shift_value:.1f}_input")
-
-        # Convolution
-        conv_output = lq.layers.QuantConv2D(
-            out_channels,
-            kernel_size=3,
-            strides=2 if downsample else 1,
-            padding="same",
-            input_quantizer=self.input_quantizer,
-            kernel_quantizer=self.kernel_quantizer,
-            kernel_constraint=self.kernel_constraint,
-            kernel_regularizer=self.kernel_regularizer
-            if self.kernel_quantizer is None
-            else None,
-            kernel_initializer=self.kernel_initializer,
-            use_bias=False,
-            name=f"{name}_conv2d",
-        )(shifted_conv_input)
-        # )(x)
-
-        # binary convolution rescaling
-        x = self._scale_binary_conv_output(conv_input, conv_output, name)
-
-        # PReLU activation
-        x = tf.keras.layers.PReLU(shared_axes=[1, 2], name=f"{name}_prelu")(x)
-
-        # Skip connection
-        return tf.keras.layers.Add(name=f"{name}_skip_add")([x, shortcut_add])
-
     def _get_imagenet_weights_path(self):
         if (
             not self.kernel_quantizer == "ste_sign"
-            and (self.input_quantizer == "ste_sign" or self.input_quantizer == "ste_shift_sign")
+            and (self.input_quantizer in ["ste_sign", "ste_unsign", "ste_shift_sign", "ste_shift_unsign"])
         ):
             raise ValueError(
                 f"{self.model_name} only has ImageNet weights for the BNN variant"
@@ -485,29 +439,33 @@ class ResNet18Factory(_SharedBaseFactory):
 @factory
 class StrongBaselineNetBANFactory(StrongBaselineNetFactory):
     model_name = Field("baseline_ban")
-    input_quantizer = "ste_sign"
     kernel_quantizer = None
     kernel_constraint = None
 
-    # @property
-    # def input_quantizer(self):
-        # return lq.quantizers.SteShiftSign(shift_value=1.0)
+    @property
+    def input_quantizer(self):
+        if self.use_unsign:
+            return lq.quantizers.SteUnsign()
+        else:
+            return lq.quantizers.SteSign()
 
     @property
     def kernel_regularizer(self):
-        return tf.keras.regularizers.l2(self.__component_parent__.__component_parent__.weight_decay_constant)
+        return tf.keras.regularizers.l2(self.weight_decay_constant)
 
 
 @factory
 class StrongBaselineNetBNNFactory(StrongBaselineNetFactory):
     model_name = Field("baseline_bnn")
-    input_quantizer = "ste_sign"
     kernel_quantizer = "ste_sign"
     kernel_constraint = "weight_clip"
 
-    # @property
-    # def input_quantizer(self):
-        # return lq.quantizers.SteShiftSign(shift_value=1.0)
+    @property
+    def input_quantizer(self):
+        if self.use_unsign:
+            return lq.quantizers.SteUnsign()
+        else:
+            return lq.quantizers.SteSign()
 
 
 @factory
@@ -518,41 +476,46 @@ class RealToBinNetFPFactory(RealToBinNetFactory):
 
     @property
     def input_quantizer(self):
-        # TODO (VINN)
-        return tf.keras.layers.Activation("tanh")
-        # return tf.keras.layers.Activation("sigmoid")
+        if self.use_unsign:
+            return tf.keras.layers.Activation("sigmoid")
+        else:
+            return tf.keras.layers.Activation("tanh")
 
     @property
     def kernel_regularizer(self):
-        return tf.keras.regularizers.l2(self.__component_parent__.__component_parent__.weight_decay_constant)
+        return tf.keras.regularizers.l2(self.weight_decay_constant)
 
 
 @factory
 class RealToBinNetBANFactory(RealToBinNetFactory):
     model_name = Field("r2b_ban")
-    input_quantizer = "ste_sign"
     kernel_quantizer = None
     kernel_constraint = None
 
-    # @property
-    # def input_quantizer(self):
-        # return lq.quantizers.SteShiftSign(shift_value=1.0)
+    @property
+    def input_quantizer(self):
+        if self.use_unsign:
+            return lq.quantizers.SteUnsign()
+        else:
+            return lq.quantizers.SteSign()
 
     @property
     def kernel_regularizer(self):
-        return tf.keras.regularizers.l2(self.__component_parent__.__component_parent__.weight_decay_constant)
+        return tf.keras.regularizers.l2(self.weight_decay_constant)
 
 
 @factory
 class RealToBinNetBNNFactory(RealToBinNetFactory):
     model_name = Field("r2b_bnn")
-    input_quantizer = "ste_sign"
     kernel_quantizer = "ste_sign"
     kernel_constraint = "weight_clip"
 
-    # @property
-    # def input_quantizer(self):
-        # return lq.quantizers.SteShiftSign(shift_value=1.0)
+    @property
+    def input_quantizer(self):
+        if self.use_unsign:
+            return lq.quantizers.SteUnsign()
+        else:
+            return lq.quantizers.SteSign()
 
 
 @factory
@@ -564,7 +527,7 @@ class ResNet18FPFactory(ResNet18Factory):
 
     @property
     def kernel_regularizer(self):
-        return tf.keras.regularizers.l2(self.__component_parent__.__component_parent__.weight_decay_constant)
+        return tf.keras.regularizers.l2(self.weight_decay_constant)
 
 
 def RealToBinaryNet(
