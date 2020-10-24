@@ -112,6 +112,7 @@ class TrainR2BBFP(TrainFPResnet18):
     )
 
     x_offset: float = Field(0.0)
+    use_unsign: bool = Field(False)
     teacher_model = ComponentField(ResNet18FPFactory)
     initialize_teacher_weights_from = Field("resnet_fp")
     student_model = ComponentField(RealToBinNetFPFactory)
@@ -208,7 +209,8 @@ class TrainR2BBNNAlternative(TrainR2BBNN):
 @task
 class TrainR2B(MultiStageExperiment):
     model_modifier: str = Field("default")
-    # input_quantizer: str = Field("ste_sign")
+    use_unsign: bool = Field(False)
+
     stage_0 = ComponentField(TrainFPResnet18)
     stage_1 = ComponentField(TrainR2BBFP)
     stage_2 = ComponentField(TrainR2BBAN)
