@@ -113,6 +113,7 @@ class TrainR2BBFP(TrainFPResnet18):
 
     x_offset: float = Field(0.0)
     use_unsign: bool = Field(False)
+    use_hard_activation: bool = Field(False)
     teacher_model = ComponentField(ResNet18FPFactory)
     initialize_teacher_weights_from = Field("resnet_fp")
     student_model = ComponentField(RealToBinNetFPFactory)

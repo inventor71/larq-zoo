@@ -471,15 +471,23 @@ class StrongBaselineNetBNNFactory(StrongBaselineNetFactory):
 @factory
 class RealToBinNetFPFactory(RealToBinNetFactory):
     model_name = Field("r2b_fp")
+    use_hard_activation: bool = Field()
     kernel_quantizer = None
     kernel_constraint = None
 
     @property
     def input_quantizer(self):
         if self.use_unsign:
-            return tf.keras.layers.Activation("sigmoid")
+            if self.use_hard_activation:
+                ## TODO (VINN): this should be Shifted to match the sigmoid!!
+                return lq.activations.HardTanh(lower_b=0.0, upper_b=1.0)
+            else:
+                return tf.keras.layers.Activation("sigmoid")
         else:
-            return tf.keras.layers.Activation("tanh")
+            if self.use_hard_activation:
+                return lq.activations.HardTanh(lower_b=-1.0, upper_b=1.0)
+            else:
+                return tf.keras.layers.Activation("tanh")
 
     @property
     def kernel_regularizer(self):
