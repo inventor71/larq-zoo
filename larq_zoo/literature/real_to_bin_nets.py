@@ -292,6 +292,8 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
         shift_value = self.x_offset
         if shift_value != 0:
             x = tf.add(conv_input, -shift_value, name=f"{name}_shift{shift_value:.1f}_input")
+        else:
+            x = conv_input
 
         # Convolution
         conv_output = lq.layers.QuantConv2D(
@@ -480,7 +482,8 @@ class RealToBinNetFPFactory(RealToBinNetFactory):
         if self.use_unsign:
             if self.use_hard_activation:
                 ## TODO (VINN): this should be Shifted to match the sigmoid!!
-                return lq.activations.HardTanh(lower_b=0.0, upper_b=1.0)
+                # return lq.activations.HardTanh(lower_b=0.0, upper_b=1.0)
+                return lq.activations.HardSigmoid()
             else:
                 return tf.keras.layers.Activation("sigmoid")
         else:
