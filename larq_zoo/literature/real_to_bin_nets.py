@@ -138,6 +138,7 @@ class _SharedBaseFactory(ModelFactory, metaclass=ABCMeta):
                 2, strides=2, padding="same", name=f"{name}_shortcut_pool"
             )(x)
 
+        # import pdb; pdb.set_trace()
         x = tf.keras.layers.Conv2D(
             out_channels,
             kernel_size=1,
@@ -520,6 +521,7 @@ class RealToBinNetBNNFactory(RealToBinNetFactory):
     model_name = Field("r2b_bnn")
     kernel_quantizer = "ste_sign"
     kernel_constraint = "weight_clip"
+    # import pdb; pdb.set_trace()
 
     @property
     def input_quantizer(self):

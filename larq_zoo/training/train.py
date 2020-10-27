@@ -16,6 +16,9 @@ from larq_zoo.core import utils
 
 
 class TrainLarqZooModel(Experiment):
+    # Make note on the experiment (optional). Use to group experiments
+    notes: str = Field("")
+
     # Save model checkpoints.
     use_model_checkpointing: bool = Field(True)
 
@@ -130,12 +133,21 @@ class TrainLarqZooModel(Experiment):
 
         click.secho(str(self))
 
-        # import pdb; pdb.set_trace()
+
+        # Add a note
+        if self.notes:
+            open(Path(self.output_dir) / f"{self.notes}", 'a').close()
+
         # Save config Json
         with open(
             Path(self.output_dir) / f"{self.model.name}.json", "w"
         ) as json_file:
             json_file.write(self.model.to_json())
+
+        with open(
+            Path(self.output_dir) / f"{self.model.name}.fields", "w"
+        ) as field_file:
+            field_file.write(str(self))
 
         self.model.fit(
             train_data,

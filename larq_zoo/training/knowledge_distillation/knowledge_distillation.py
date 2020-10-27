@@ -392,8 +392,8 @@ class TeacherStudentModelFactory(ModelFactory):
             return self.student_model
         else:
             assert (
-                self.output_matching_weight > 0 or self.attention_matching_weight > 0
-            ), "Teacher model loaded but all teacher-student knowledge distillation losses are 0"
+                self.output_matching_weight >= 0 or self.attention_matching_weight >= 0
+            ), "Teacher model loaded but all teacher-student knowledge distillation losses are smaller than 0"
 
         assert (
             len(self.teacher_model.inputs) == 1 and len(self.student_model.inputs) == 1
