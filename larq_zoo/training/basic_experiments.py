@@ -135,6 +135,7 @@ class TrainXNORNet(TrainLarqZooModel):
     batch_size = Field(1200)
 
     initial_lr: float = Field(0.001)
+    x_offset: float = Field(0.0)
 
     def learning_rate_schedule(self, epoch):
         epoch_dec_1 = 19

@@ -193,6 +193,8 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
     scaling_r: int = 8
     x_offset: float = Field()
     use_unsign: bool = Field()
+    use_scale_bconv: bool = Field()
+    use_prelu_in_half_block: bool = Field()
 
     input_quantizer = None
     kernel_quantizer = None
@@ -313,11 +315,19 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
             name=f"{name}_conv2d",
         )(x)
 
-        # binary convolution rescaling
-        x = self._scale_binary_conv_output(conv_input, conv_output, name)
+        # binary convolution rescaling (TODO)
+        # x = self._scale_binary_conv_output(conv_input, conv_output, name)
+        if self.use_scale_bconv:
+            x = self._scale_binary_conv_output(x, conv_output, name)
+        else:
+            x = conv_output
 
         # PReLU activation
-        x = tf.keras.layers.PReLU(shared_axes=[1, 2], name=f"{name}_prelu")(x)
+        if self.use_prelu_in_half_block:
+            x = tf.keras.layers.PReLU(shared_axes=[1, 2], name=f"{name}_prelu")(x)
+        else:
+            x = tf.keras.layers.ReLU(name=f"{name}_relu")(x)
+
 
         # Skip connection
         return tf.keras.layers.Add(name=f"{name}_skip_add")([x, shortcut_add])

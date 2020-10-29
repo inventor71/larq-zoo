@@ -58,6 +58,10 @@ class BinaryResNetE18Factory(ModelFactory):
         else:
             residual = x
 
+        ## (TODO) put shift here
+        assert(False), "I want to put shifting here"
+        x = x
+
         x = lq.layers.QuantConv2D(
             filters,
             kernel_size=3,

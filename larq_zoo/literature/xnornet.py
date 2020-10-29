@@ -2,7 +2,7 @@ from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import factory
+from zookeeper import Field, factory
 
 from larq_zoo.core import utils
 from larq_zoo.core.model_factory import ModelFactory
@@ -27,12 +27,15 @@ class XNORNetFactory(ModelFactory):
     input_quantizer = "ste_sign"
     kernel_quantizer = "xnor_weight_scale"
     kernel_constraint = "weight_clip"
+    x_offset: float = Field()
 
     @property
     def kernel_regularizer(self):
         return tf.keras.regularizers.l2(5e-7)
 
     def build(self) -> tf.keras.models.Model:
+        shift_value = self.x_offset
+
         quant_conv_kwargs = dict(
             kernel_quantizer=self.kernel_quantizer,
             input_quantizer=self.input_quantizer,
@@ -58,24 +61,44 @@ class XNORNetFactory(ModelFactory):
         x = tf.keras.layers.BatchNormalization(momentum=0.9, scale=False, epsilon=1e-4)(
             x
         )
+
+        if shift_value != 0:
+            x = tf.add(x, -shift_value, name=f"shift{shift_value:.1f}_input")
+
         x = lq.layers.QuantConv2D(256, (5, 5), padding="same", **quant_conv_kwargs)(x)
         x = tf.keras.layers.MaxPool2D(pool_size=(3, 3), strides=(2, 2))(x)
         x = tf.keras.layers.BatchNormalization(momentum=0.9, scale=False, epsilon=1e-4)(
             x
         )
+
+        if shift_value != 0:
+            x = tf.add(x, -shift_value, name=f"shift{shift_value:.1f}_input")
+
         x = lq.layers.QuantConv2D(384, (3, 3), padding="same", **quant_conv_kwargs)(x)
         x = tf.keras.layers.BatchNormalization(momentum=0.9, scale=False, epsilon=1e-4)(
             x
         )
+
+        if shift_value != 0:
+            x = tf.add(x, -shift_value, name=f"shift{shift_value:.1f}_input")
+
         x = lq.layers.QuantConv2D(384, (3, 3), padding="same", **quant_conv_kwargs)(x)
         x = tf.keras.layers.BatchNormalization(momentum=0.9, scale=False, epsilon=1e-4)(
             x
         )
+
+        if shift_value != 0:
+            x = tf.add(x, -shift_value, name=f"shift{shift_value:.1f}_input")
+
         x = lq.layers.QuantConv2D(256, (3, 3), padding="same", **quant_conv_kwargs)(x)
         x = tf.keras.layers.MaxPool2D(pool_size=(3, 3), strides=(2, 2))(x)
         x = tf.keras.layers.BatchNormalization(momentum=0.9, scale=False, epsilon=1e-4)(
             x
         )
+
+        if shift_value != 0:
+            x = tf.add(x, -shift_value, name=f"shift{shift_value:.1f}_input")
+
         x = lq.layers.QuantConv2D(4096, (6, 6), padding="valid", **quant_conv_kwargs)(x)
         x = tf.keras.layers.BatchNormalization(momentum=0.9, scale=False, epsilon=1e-4)(
             x
